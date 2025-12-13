@@ -9,7 +9,9 @@ networks:
 services:
   # Frontend
   frontend:
-    build: ./frontend
+    # build: ./frontend
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-frontend:latest
+    pull_policy: always
     container_name: diabetes-frontend
     expose:
       - "3000"
@@ -52,7 +54,9 @@ services:
 
   # API Gateway
   api-gateway:
-    build: ./api-gateway
+    # build: ./api-gateway
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-api-gateway:latest
+    pull_policy: always
     container_name: diabetes-api-gateway
     expose:
       - "4000"
@@ -111,7 +115,9 @@ services:
 
   # Auth Service
   auth-service:
-    build: ./auth-service
+    # build: ./auth-service
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-auth:latest
+    pull_policy: always
     container_name: diabetes-auth
     expose:
       - "4001"
@@ -137,7 +143,9 @@ services:
 
   # Food Recognition Service
   food-recognition:
-    build: ./food-recognition-service
+    # build: ./food-recognition-service
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-food-recognition:latest
+    pull_policy: always
     container_name: diabetes-food-recognition
     expose:
       - "4002"
@@ -161,7 +169,9 @@ services:
 
   # Meal Tracking Service
   meal-tracking:
-    build: ./meal-tracking-service
+    # build: ./meal-tracking-service
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-meal-tracking:latest
+    pull_policy: always
     container_name: diabetes-meal-tracking
     expose:
       - "4003"
@@ -182,7 +192,9 @@ services:
 
   # User Profile Service
   user-profile:
-    build: ./user-profile-service
+    # build: ./user-profile-service
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-user-profile:latest
+    pull_policy: always
     container_name: diabetes-user-profile
     expose:
       - "4004"
@@ -203,7 +215,9 @@ services:
 
   # Notification Service
   notification:
-    build: ./notification-service
+    # build: ./notification-service
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-notification:latest
+    pull_policy: always
     container_name: diabetes-notification
     expose:
       - "4005"
@@ -225,7 +239,9 @@ services:
 
   # Analytics Service
   analytics:
-    build: ./analytics-service
+    # build: ./analytics-service
+    image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-analytics:latest
+    pull_policy: always
     container_name: diabetes-analytics
     expose:
       - "4006"
