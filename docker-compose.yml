@@ -1,16 +1,49 @@
 version: '3.8'
 
+networks:
+  proxy:
+    external: true
+  internal:
+    driver: bridge
+
 services:
   # Frontend
   frontend:
     build: ./frontend
-    ports:
-      - "3000:3000"
+    container_name: diabetes-frontend
+    expose:
+      - "3000"
     environment:
-      - REACT_APP_API_GATEWAY=http://localhost:4000
+      - REACT_APP_API_GATEWAY=${REACT_APP_API_GATEWAY:-https://api.yourdomain.com}
     depends_on:
       - api-gateway
     restart: unless-stopped
+    networks:
+      - proxy
+      - internal
+    labels:
+      # Traefik labels
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # Frontend router
+      - "traefik.http.routers.diabetes-frontend.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
+      - "traefik.http.routers.diabetes-frontend.entrypoints=websecure"
+      - "traefik.http.routers.diabetes-frontend.tls=true"
+      - "traefik.http.routers.diabetes-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.diabetes-frontend.loadbalancer.server.port=3000"
+
+      # Redirect www to non-www
+      - "traefik.http.middlewares.diabetes-redirect-www.redirectregex.regex=^https://www\\.(.+)"
+      - "traefik.http.middlewares.diabetes-redirect-www.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.diabetes-redirect-www.redirectregex.permanent=true"
+
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.diabetes-frontend-http.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
+      - "traefik.http.routers.diabetes-frontend-http.entrypoints=web"
+      - "traefik.http.routers.diabetes-frontend-http.middlewares=diabetes-redirect-https"
+      - "traefik.http.middlewares.diabetes-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.diabetes-redirect-https.redirectscheme.permanent=true"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
       interval: 30s
@@ -20,16 +53,19 @@ services:
   # API Gateway
   api-gateway:
     build: ./api-gateway
-    ports:
-      - "4000:4000"
+    container_name: diabetes-api-gateway
+    expose:
+      - "4000"
     environment:
       - AUTH_SERVICE_URL=http://auth-service:4001
-      - FOOD_SERVICE_URL=http://food-recognition:4002
-      - MEAL_SERVICE_URL=http://meal-tracking:4003
-      - PROFILE_SERVICE_URL=http://user-profile:4004
+      - FOOD_RECOGNITION_SERVICE_URL=http://food-recognition:4002
+      - MEAL_TRACKING_SERVICE_URL=http://meal-tracking:4003
+      - USER_PROFILE_SERVICE_URL=http://user-profile:4004
       - NOTIFICATION_SERVICE_URL=http://notification:4005
       - ANALYTICS_SERVICE_URL=http://analytics:4006
       - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+      - TRUST_PROXY=true
     depends_on:
       - auth-service
       - food-recognition
@@ -38,6 +74,35 @@ services:
       - notification
       - analytics
     restart: unless-stopped
+    networks:
+      - proxy
+      - internal
+    labels:
+      # Traefik labels
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # API Gateway router
+      - "traefik.http.routers.diabetes-api.rule=Host(`api.yourdomain.com`)"
+      - "traefik.http.routers.diabetes-api.entrypoints=websecure"
+      - "traefik.http.routers.diabetes-api.tls=true"
+      - "traefik.http.routers.diabetes-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.diabetes-api.loadbalancer.server.port=4000"
+
+      # Security headers
+      - "traefik.http.middlewares.diabetes-api-headers.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow"
+      - "traefik.http.middlewares.diabetes-api-headers.headers.sslRedirect=true"
+      - "traefik.http.middlewares.diabetes-api-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.diabetes-api-headers.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.diabetes-api-headers.headers.stsPreload=true"
+      - "traefik.http.routers.diabetes-api.middlewares=diabetes-api-headers"
+
+      # HTTP to HTTPS redirect
+      - "traefik.http.routers.diabetes-api-http.rule=Host(`api.yourdomain.com`)"
+      - "traefik.http.routers.diabetes-api-http.entrypoints=web"
+      - "traefik.http.routers.diabetes-api-http.middlewares=diabetes-api-redirect-https"
+      - "traefik.http.middlewares.diabetes-api-redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.diabetes-api-redirect-https.redirectscheme.permanent=true"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4000/health" ]
       interval: 30s
@@ -47,18 +112,23 @@ services:
   # Auth Service
   auth-service:
     build: ./auth-service
-    ports:
-      - "4001:4001"
+    container_name: diabetes-auth
+    expose:
+      - "4001"
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/auth_db
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:-https://api.yourdomain.com/api/auth/google/callback}
       - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth_db
       - NODE_ENV=production
+      - TRUST_PROXY=true
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4001/health" ]
       interval: 30s
@@ -68,8 +138,9 @@ services:
   # Food Recognition Service
   food-recognition:
     build: ./food-recognition-service
-    ports:
-      - "4002:4002"
+    container_name: diabetes-food-recognition
+    expose:
+      - "4002"
     environment:
       - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
       - MINIO_ENDPOINT=minio:9000
@@ -80,6 +151,8 @@ services:
       minio:
         condition: service_started
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4002/health" ]
       interval: 30s
@@ -89,15 +162,18 @@ services:
   # Meal Tracking Service
   meal-tracking:
     build: ./meal-tracking-service
-    ports:
-      - "4003:4003"
+    container_name: diabetes-meal-tracking
+    expose:
+      - "4003"
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/meals_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/meals_db
       - NODE_ENV=production
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4003/health" ]
       interval: 30s
@@ -107,15 +183,18 @@ services:
   # User Profile Service
   user-profile:
     build: ./user-profile-service
-    ports:
-      - "4004:4004"
+    container_name: diabetes-user-profile
+    expose:
+      - "4004"
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/profiles_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/profiles_db
       - NODE_ENV=production
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4004/health" ]
       interval: 30s
@@ -125,15 +204,19 @@ services:
   # Notification Service
   notification:
     build: ./notification-service
-    ports:
-      - "4005:4005"
+    container_name: diabetes-notification
+    expose:
+      - "4005"
     environment:
       - REDIS_URL=redis://redis:6379
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
       - NODE_ENV=production
     depends_on:
-      redis:
-        condition: service_healthy
+      - redis
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4005/health" ]
       interval: 30s
@@ -143,36 +226,41 @@ services:
   # Analytics Service
   analytics:
     build: ./analytics-service
-    ports:
-      - "4006:4006"
+    container_name: diabetes-analytics
+    expose:
+      - "4006"
     environment:
-      - DATABASE_URL=postgresql://user:password@postgres:5432/analytics_db
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/analytics_db
+      - MEALS_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/meals_db
       - NODE_ENV=production
     depends_on:
       postgres:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4006/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  # PostgreSQL
+  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    ports:
-      - "5432:5432"
+    container_name: diabetes-postgres
     environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
       - POSTGRES_MULTIPLE_DATABASES=auth_db,meals_db,profiles_db,analytics_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -180,11 +268,12 @@ services:
   # Redis
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    container_name: diabetes-redis
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    networks:
+      - internal
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
@@ -193,17 +282,33 @@ services:
 
   # MinIO (S3-compatible storage)
   minio:
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+    image: minio/minio:latest
+    container_name: diabetes-minio
+    command: server /data --console-address ":9001"
+    expose:
+      - "9000"
+      - "9001"
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
-    command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
     restart: unless-stopped
+    networks:
+      - internal
+      - proxy
+    labels:
+      # Traefik labels for MinIO Console (optional)
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # MinIO Console
+      - "traefik.http.routers.diabetes-minio-console.rule=Host(`minio.yourdomain.com`)"
+      - "traefik.http.routers.diabetes-minio-console.entrypoints=websecure"
+      - "traefik.http.routers.diabetes-minio-console.tls=true"
+      - "traefik.http.routers.diabetes-minio-console.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.diabetes-minio-console.service=diabetes-minio-console"
+      - "traefik.http.services.diabetes-minio-console.loadbalancer.server.port=9001"
 
 volumes:
   postgres_data:
