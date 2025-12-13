@@ -47,6 +47,12 @@ const Dashboard = () => {
 
     const categories = ['Desayuno', 'Almuerzo', 'Media tarde', 'Cena'];
 
+    useEffect(() => {
+        if (!loading && user && !profile) {
+            navigate('/setup');
+        }
+    }, [user, profile, loading, navigate]);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -107,8 +113,8 @@ const Dashboard = () => {
                     <button
                         onClick={() => setFilter('all')}
                         className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${filter === 'all'
-                                ? 'bg-primary-600 text-white'
-                                : 'bg-white text-gray-700 border-2 border-gray-200'
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-white text-gray-700 border-2 border-gray-200'
                             }`}
                     >
                         Todas
@@ -118,8 +124,8 @@ const Dashboard = () => {
                             key={category}
                             onClick={() => setFilter(category)}
                             className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition ${filter === category
-                                    ? 'bg-primary-600 text-white'
-                                    : 'bg-white text-gray-700 border-2 border-gray-200'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-white text-gray-700 border-2 border-gray-200'
                                 }`}
                         >
                             {category}

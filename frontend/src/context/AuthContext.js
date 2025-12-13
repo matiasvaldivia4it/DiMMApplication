@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const checkAuth = async () => {
+        let userData = null;
         try {
             const token = localStorage.getItem('accessToken');
             if (!token) {
@@ -29,7 +30,7 @@ export const AuthProvider = ({ children }) => {
                 return;
             }
 
-            const userData = await authService.getCurrentUser();
+            userData = await authService.getCurrentUser();
             setUser(userData);
             setIsAuthenticated(true);
 
@@ -37,9 +38,18 @@ export const AuthProvider = ({ children }) => {
             const profileData = await profileService.getProfile(userData.id);
             setProfile(profileData);
         } catch (error) {
-            console.error('Auth check failed:', error);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+            // If profile not found (404) but user is authenticated, don't logout
+            if (userData && error.response && error.response.status === 404) {
+                console.warn('Profile not found for authenticated user, redirecting to setup...');
+                setProfile(null);
+            } else {
+                console.error('Auth check failed:', error);
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                setUser(null);
+                setProfile(null);
+                setIsAuthenticated(false);
+            }
         } finally {
             setLoading(false);
         }
