@@ -48,7 +48,7 @@ Esta guía te llevará paso a paso para configurar Google OAuth en tu aplicació
 ### Configuración de la Pantalla de Consentimiento:
 
 **Información de la aplicación:**
-- **Nombre de la aplicación**: `Calculadora de Insulina`
+- **Nombre de la aplicación**: `Calculadora de Hidrato de Carbono`
 - **Correo electrónico de asistencia al usuario**: Tu correo de Google
 - **Logotipo de la aplicación**: (Opcional) Puedes subirlo después
 

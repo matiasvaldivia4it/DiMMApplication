@@ -20,7 +20,8 @@ export const authService = {
 
 export const profileService = {
     getProfile: async (userId) => {
-        const response = await api.get(`/profile/${userId}`);
+        // Add timestamp to prevent caching of previous 404 responses
+        const response = await api.get(`/profile/${userId}?_t=${Date.now()}`);
         return response.data;
     },
 
