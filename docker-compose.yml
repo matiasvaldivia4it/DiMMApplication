@@ -13,8 +13,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-frontend:latest
     pull_policy: always
     container_name: diabetes-frontend
-    expose:
-      - "3000"
+    ports:
+      - "3000:3000"
     environment:
       - REACT_APP_API_GATEWAY=${REACT_APP_API_GATEWAY:-https://api.yourdomain.com}
     depends_on:
@@ -35,8 +35,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-api-gateway:latest
     pull_policy: always
     container_name: diabetes-api-gateway
-    expose:
-      - "4000"
+    ports:
+      - "4000:4000"
     environment:
       - AUTH_SERVICE_URL=http://auth-service:4001
       - FOOD_RECOGNITION_SERVICE_URL=http://food-recognition:4002
@@ -70,8 +70,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-auth:latest
     pull_policy: always
     container_name: diabetes-auth
-    expose:
-      - "4001"
+    ports:
+      - "4001:4001"
     environment:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
@@ -98,8 +98,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-food-recognition:latest
     pull_policy: always
     container_name: diabetes-food-recognition
-    expose:
-      - "4002"
+    ports:
+      - "4002:4002"
     environment:
       - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
       - MINIO_ENDPOINT=minio:9000
@@ -124,8 +124,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-meal-tracking:latest
     pull_policy: always
     container_name: diabetes-meal-tracking
-    expose:
-      - "4003"
+    ports:
+      - "4003:4003"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/meals_db
       - NODE_ENV=production
@@ -147,8 +147,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-user-profile:latest
     pull_policy: always
     container_name: diabetes-user-profile
-    expose:
-      - "4004"
+    ports:
+      - "4004:4004"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/profiles_db
       - NODE_ENV=production
@@ -170,8 +170,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-notification:latest
     pull_policy: always
     container_name: diabetes-notification
-    expose:
-      - "4005"
+    ports:
+      - "4005:4005"
     environment:
       - REDIS_URL=redis://redis:6379
       - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
@@ -194,8 +194,8 @@ services:
     image: ${DOCKER_USERNAME:-matiasvaldivia4it}/diabetes-analytics:latest
     pull_policy: always
     container_name: diabetes-analytics
-    expose:
-      - "4006"
+    ports:
+      - "4006:4006"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/analytics_db
       - MEALS_DATABASE_URL=postgresql://postgres:postgres@postgres:5432/meals_db
@@ -252,9 +252,9 @@ services:
     image: minio/minio:latest
     container_name: diabetes-minio
     command: server /data --console-address ":9001"
-    expose:
-      - "9000"
-      - "9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin

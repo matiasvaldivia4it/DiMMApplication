@@ -12,26 +12,38 @@ Esta aplicación está configurada para funcionar detrás de un proxy reverso co
 
 ---
 
-## 🚀 Configuración con Nginx Proxy Manager
+## 🚀 Configuración con tu Proxy Manager Existente
 
-### 1. Desplegar Nginx Proxy Manager
+Como ya tienes un Nginx Proxy Manager (u otro proxy) corriendo en el mismo host, simplemente necesitas conectar los contenedores.
 
-Hemos creado un archivo `docker-compose.proxy.yml` para facilitar el despliegue de NPM.
+### 1. Asegurar la Red
 
-1. **Crear la red de proxy** (si no existe):
-   ```bash
-   docker network create proxy
-   ```
+Tu Proxy Manager debe estar en una red Docker. Si tu proxy usa una red llamada `proxy`, asegúrate de que esté configurada como `external: true` en el `docker-compose.yml` (ya está configurado así).
 
-2. **Iniciar Nginx Proxy Manager:**
-   ```bash
-   docker compose -f docker-compose.proxy.yml up -d
-   ```
+Si tu red tiene otro nombre (ej. `npm-network`), actualiza el final de `docker-compose.yml`:
 
-3. **Acceder al Panel de Administración:**
-   - URL: `http://localhost:81`
-   - Email por defecto: `admin@example.com`
-   - Password por defecto: `changeme`
+```yaml
+networks:
+  proxy:
+    external: true
+    name: npm-network  # <--- Agrega el nombre real de tu red aquí si es diferente
+```
+
+### 2. Iniciar la Aplicación
+
+```bash
+docker compose up -d
+```
+
+### 3. Configurar tu Proxy Manager
+
+Accede a tu panel de administración existente y crea los Proxy Hosts apuntando a los nombres de contenedor:
+
+- **Frontend**: `diabetes-frontend` : `3000`
+- **API Gateway**: `diabetes-api-gateway` : `4000`
+- **MinIO**: `diabetes-minio` : `9001`
+
+> **Nota:** Como los contenedores ahora están exponiendo puertos, también puedes acceder localmente via `localhost:3000`, etc.
 
 ### 2. Actualizar Variables de Entorno
 
