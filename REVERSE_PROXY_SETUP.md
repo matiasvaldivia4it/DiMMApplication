@@ -12,64 +12,17 @@ Esta aplicación está configurada para funcionar detrás de un proxy reverso co
 
 ---
 
-## 🚀 Configuración con Traefik
+## 🚀 Configuración con Nginx Proxy Manager
 
 ### 1. Crear Red de Proxy
 
-Primero, crea la red externa que Traefik usará:
+Primero, crea la red externa que Nginx Proxy Manager usará:
 
 ```bash
 docker network create proxy
 ```
 
-### 2. Configurar Traefik
-
-Ejemplo de `docker-compose.yml` para Traefik:
-
-```yaml
-version: '3.8'
-
-services:
-  traefik:
-    image: traefik:v2.10
-    container_name: traefik
-    command:
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--certificatesresolvers.letsencrypt.acme.email=tu@email.com"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik-certificates:/letsencrypt
-    networks:
-      - proxy
-    labels:
-      # Dashboard
-      - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.yourdomain.com`)"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
-      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.traefik.service=api@internal"
-      # Basic Auth (genera con: htpasswd -nb admin password)
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$apr1$$..."
-
-networks:
-  proxy:
-    external: true
-
-volumes:
-  traefik-certificates:
-```
-
-### 3. Actualizar Variables de Entorno
+### 2. Actualizar Variables de Entorno
 
 Edita tu `.env`:
 
@@ -79,29 +32,11 @@ REACT_APP_API_GATEWAY=https://api.yourdomain.com
 GOOGLE_CALLBACK_URL=https://api.yourdomain.com/api/auth/google/callback
 ```
 
-### 4. Actualizar Labels en docker-compose.yml
-
-Reemplaza `yourdomain.com` con tu dominio real en todos los labels de Traefik:
-
-```bash
-# Buscar y reemplazar en docker-compose.yml
-sed -i 's/yourdomain.com/tudominio.com/g' docker-compose.yml
-```
-
-O edita manualmente:
-- `Host(\`yourdomain.com\`)` → `Host(\`tudominio.com\`)`
-- `Host(\`api.yourdomain.com\`)` → `Host(\`api.tudominio.com\`)`
-- `Host(\`minio.yourdomain.com\`)` → `Host(\`minio.tudominio.com\`)`
-
-### 5. Iniciar la Aplicación
+### 3. Iniciar la Aplicación
 
 ```bash
 docker compose up -d
 ```
-
----
-
-## 🔧 Configuración con Nginx Proxy Manager
 
 ### 1. Instalar Nginx Proxy Manager
 
