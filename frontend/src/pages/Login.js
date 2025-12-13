@@ -2,7 +2,7 @@ import React from 'react';
 
 const Login = () => {
     const handleGoogleLogin = () => {
-        const apiGateway = process.env.REACT_APP_API_GATEWAY || 'http://localhost:4000';
+        const apiGateway = window.__ENV__?.REACT_APP_API_GATEWAY || process.env.REACT_APP_API_GATEWAY || 'http://localhost:4000';
         window.location.href = `${apiGateway}/api/auth/google`;
     };
 
