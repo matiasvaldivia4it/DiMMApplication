@@ -15,7 +15,8 @@
         "helmet": "^7.1.0",
         "morgan": "^1.10.0",
         "pdfkit": "^0.14.0",
-        "json2csv": "^6.0.0-alpha.2"
+        "json2csv": "^6.0.0-alpha.2",
+        "axios": "^1.6.0"
     },
     "devDependencies": {
         "nodemon": "^3.0.2"

@@ -1,8 +1,9 @@
 const Minio = require('minio');
 
+const endpointParts = (process.env.MINIO_ENDPOINT || 'minio').split(':');
 const minioClient = new Minio.Client({
-    endPoint: process.env.MINIO_ENDPOINT || 'minio',
-    port: 9000,
+    endPoint: endpointParts[0],
+    port: endpointParts[1] ? parseInt(endpointParts[1], 10) : 9000,
     useSSL: false,
     accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
     secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
