@@ -14,13 +14,24 @@ Esta aplicación está configurada para funcionar detrás de un proxy reverso co
 
 ## 🚀 Configuración con Nginx Proxy Manager
 
-### 1. Crear Red de Proxy
+### 1. Desplegar Nginx Proxy Manager
 
-Primero, crea la red externa que Nginx Proxy Manager usará:
+Hemos creado un archivo `docker-compose.proxy.yml` para facilitar el despliegue de NPM.
 
-```bash
-docker network create proxy
-```
+1. **Crear la red de proxy** (si no existe):
+   ```bash
+   docker network create proxy
+   ```
+
+2. **Iniciar Nginx Proxy Manager:**
+   ```bash
+   docker compose -f docker-compose.proxy.yml up -d
+   ```
+
+3. **Acceder al Panel de Administración:**
+   - URL: `http://localhost:81`
+   - Email por defecto: `admin@example.com`
+   - Password por defecto: `changeme`
 
 ### 2. Actualizar Variables de Entorno
 

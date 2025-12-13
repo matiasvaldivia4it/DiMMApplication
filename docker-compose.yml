@@ -23,29 +23,6 @@ services:
     networks:
       - proxy
       - internal
-    labels:
-      # Traefik labels
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-
-      # Frontend router
-      - "traefik.http.routers.diabetes-frontend.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
-      - "traefik.http.routers.diabetes-frontend.entrypoints=websecure"
-      - "traefik.http.routers.diabetes-frontend.tls=true"
-      - "traefik.http.routers.diabetes-frontend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.diabetes-frontend.loadbalancer.server.port=3000"
-
-      # Redirect www to non-www
-      - "traefik.http.middlewares.diabetes-redirect-www.redirectregex.regex=^https://www\\.(.+)"
-      - "traefik.http.middlewares.diabetes-redirect-www.redirectregex.replacement=https://$${1}"
-      - "traefik.http.middlewares.diabetes-redirect-www.redirectregex.permanent=true"
-
-      # HTTP to HTTPS redirect
-      - "traefik.http.routers.diabetes-frontend-http.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
-      - "traefik.http.routers.diabetes-frontend-http.entrypoints=web"
-      - "traefik.http.routers.diabetes-frontend-http.middlewares=diabetes-redirect-https"
-      - "traefik.http.middlewares.diabetes-redirect-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.diabetes-redirect-https.redirectscheme.permanent=true"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:3000" ]
       interval: 30s
@@ -81,32 +58,6 @@ services:
     networks:
       - proxy
       - internal
-    labels:
-      # Traefik labels
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-
-      # API Gateway router
-      - "traefik.http.routers.diabetes-api.rule=Host(`api.yourdomain.com`)"
-      - "traefik.http.routers.diabetes-api.entrypoints=websecure"
-      - "traefik.http.routers.diabetes-api.tls=true"
-      - "traefik.http.routers.diabetes-api.tls.certresolver=letsencrypt"
-      - "traefik.http.services.diabetes-api.loadbalancer.server.port=4000"
-
-      # Security headers
-      - "traefik.http.middlewares.diabetes-api-headers.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow"
-      - "traefik.http.middlewares.diabetes-api-headers.headers.sslRedirect=true"
-      - "traefik.http.middlewares.diabetes-api-headers.headers.stsSeconds=31536000"
-      - "traefik.http.middlewares.diabetes-api-headers.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.diabetes-api-headers.headers.stsPreload=true"
-      - "traefik.http.routers.diabetes-api.middlewares=diabetes-api-headers"
-
-      # HTTP to HTTPS redirect
-      - "traefik.http.routers.diabetes-api-http.rule=Host(`api.yourdomain.com`)"
-      - "traefik.http.routers.diabetes-api-http.entrypoints=web"
-      - "traefik.http.routers.diabetes-api-http.middlewares=diabetes-api-redirect-https"
-      - "traefik.http.middlewares.diabetes-api-redirect-https.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.diabetes-api-redirect-https.redirectscheme.permanent=true"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4000/health" ]
       interval: 30s
@@ -313,18 +264,6 @@ services:
     networks:
       - internal
       - proxy
-    labels:
-      # Traefik labels for MinIO Console (optional)
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-
-      # MinIO Console
-      - "traefik.http.routers.diabetes-minio-console.rule=Host(`minio.yourdomain.com`)"
-      - "traefik.http.routers.diabetes-minio-console.entrypoints=websecure"
-      - "traefik.http.routers.diabetes-minio-console.tls=true"
-      - "traefik.http.routers.diabetes-minio-console.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.diabetes-minio-console.service=diabetes-minio-console"
-      - "traefik.http.services.diabetes-minio-console.loadbalancer.server.port=9001"
 
 volumes:
   postgres_data:
