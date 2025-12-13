@@ -8,6 +8,7 @@ import AddMeal from './pages/AddMeal';
 import MealDetail from './pages/MealDetail';
 import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
+import LandingPage from './pages/LandingPage';
 import './index.css';
 
 const PrivateRoute = ({ children }) => {
@@ -106,7 +107,7 @@ function App() {
                         }
                     />
 
-                    <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="/" element={<LandingPage />} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
