@@ -16,7 +16,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - REACT_APP_API_GATEWAY=${REACT_APP_API_GATEWAY:-https://api.yourdomain.com}
+      - REACT_APP_API_GATEWAY=${REACT_APP_API_GATEWAY:-https://api.dimma.auditoriasenlinea.com.ar}
     depends_on:
       - api-gateway
     restart: unless-stopped
@@ -75,7 +75,7 @@ services:
     environment:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:-https://api.yourdomain.com/api/auth/google/callback}
+      - GOOGLE_CALLBACK_URL=${GOOGLE_CALLBACK_URL:-https://api.dimma.auditoriasenlinea.com.ar/api/auth/google/callback}
       - JWT_SECRET=${JWT_SECRET}
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/auth_db
       - NODE_ENV=production
