@@ -9,7 +9,7 @@ La aplicación está construida con arquitectura de microservicios:
 - **Frontend**: React 18 + Tailwind CSS (Puerto 3000)
 - **API Gateway**: Node.js/Express (Puerto 4000)
 - **Auth Service**: Google OAuth + JWT (Puerto 4001)
-- **Food Recognition Service**: Claude AI (Puerto 4002)
+- **Food Recognition Service**: Google Gemini Vision (Puerto 4002)
 - **Meal Tracking Service**: CRUD de comidas (Puerto 4003)
 - **User Profile Service**: Gestión de perfiles (Puerto 4004)
 - **Notification Service**: Push notifications (Puerto 4005)
@@ -27,7 +27,7 @@ La aplicación está construida con arquitectura de microservicios:
 
 ### 📸 Reconocimiento de Alimentos
 - Captura de fotos con cámara del dispositivo
-- Análisis automático con Claude AI (Anthropic)
+- Análisis automático con Google Gemini Vision
 - Identificación de alimentos y carbohidratos
 - Almacenamiento de imágenes en MinIO
 
@@ -60,7 +60,7 @@ La aplicación está construida con arquitectura de microservicios:
 - Docker y Docker Compose
 - Node.js 18+ (para desarrollo local)
 - Credenciales de Google OAuth
-- API Key de Anthropic (Claude)
+- API Key de Google AI (Gemini)
 
 ### 1. Clonar el Repositorio
 
@@ -84,8 +84,8 @@ Edita `.env` con tus credenciales:
 GOOGLE_CLIENT_ID=tu_google_client_id
 GOOGLE_CLIENT_SECRET=tu_google_client_secret
 
-# Anthropic API (obtener en https://console.anthropic.com/)
-ANTHROPIC_API_KEY=tu_anthropic_api_key
+# Google AI API (obtener en https://aistudio.google.com/app/apikey)
+GOOGLE_AI_API_KEY=tu_google_ai_api_key
 
 # JWT Secret (generar con: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 JWT_SECRET=tu_jwt_secret_minimo_32_caracteres
@@ -293,7 +293,7 @@ Esta aplicación incluye múltiples disclaimers médicos:
 - MinIO
 
 ### IA y APIs
-- Anthropic Claude 3.5 Sonnet
+- Google Gemini 1.5 Flash
 - Google OAuth 2.0
 
 ### DevOps
