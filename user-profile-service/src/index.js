@@ -13,7 +13,12 @@ const PORT = process.env.PORT || 4004;
 // Middleware
 app.use(helmet());
 app.use(helmet());
-// app.use(cors()); // CORS handled by API Gateway
+// Enable CORS for internal communication and proxy compatibility
+app.use(cors({
+    origin: '*', // Trust the API Gateway
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(morgan('combined'));
 app.use(express.json());
 
