@@ -24,16 +24,26 @@ const SetupWizard = () => {
         e.preventDefault();
         setLoading(true);
 
+        if (!user) {
+            console.error('User context missing in handleSubmit');
+            alert('Error: No se ha detectado el usuario. Por favor recarga la página.');
+            setLoading(false);
+            return;
+        }
+
         try {
+            console.log('Submitting profile setup for user:', user.id, formData);
             const profile = await profileService.setupProfile({
                 userId: user.id,
                 ...formData,
             });
+            console.log('Profile setup success:', profile);
             updateProfile(profile);
             navigate('/dashboard');
         } catch (error) {
             console.error('Setup failed:', error);
-            alert('Error al configurar el perfil. Por favor intenta de nuevo.');
+            const errorMessage = error.response?.data?.error || error.message || 'Error desconocido';
+            alert(`Error al configurar el perfil: ${errorMessage}`);
         } finally {
             setLoading(false);
         }
@@ -81,8 +91,8 @@ const SetupWizard = () => {
                                                 type="button"
                                                 onClick={() => setFormData({ ...formData, insulinRatio: ratio })}
                                                 className={`py-3 px-4 rounded-lg font-semibold transition-all ${formData.insulinRatio === ratio
-                                                        ? 'bg-primary-600 text-white shadow-lg'
-                                                        : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-primary-400'
+                                                    ? 'bg-primary-600 text-white shadow-lg'
+                                                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-primary-400'
                                                     }`}
                                             >
                                                 {ratio}

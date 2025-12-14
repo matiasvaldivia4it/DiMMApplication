@@ -13,7 +13,7 @@ const setupProfileSchema = Joi.object({
     mealSchedules: Joi.array().items(
         Joi.object({
             mealType: Joi.string().valid('Desayuno', 'Almuerzo', 'Media tarde', 'Cena').required(),
-            preferredTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).required(),
+            preferredTime: Joi.string().pattern(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/).required(),
         })
     ).min(1),
 });
