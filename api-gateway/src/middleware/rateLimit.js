@@ -13,10 +13,12 @@ const generalLimiter = rateLimit({
 // Auth rate limiter (stricter)
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 10, // Limit each IP to 10 auth requests per windowMs
+    max: 100, // Increased from 10 to 100 - /auth/me is called frequently
     message: 'Too many authentication attempts, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
+    // Skip rate limiting for /auth/me endpoint (health check endpoint)
+    skip: (req) => req.path.endsWith('/me')
 });
 
 // Upload rate limiter (for food images)
