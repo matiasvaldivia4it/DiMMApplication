@@ -46,9 +46,16 @@ const services = {
 const proxyOptions = {
     changeOrigin: true,
     logLevel: 'warn',
+    proxyTimeout: 30000, // 30 seconds
+    timeout: 30000, // 30 seconds
     onError: (err, req, res) => {
         console.error('Proxy error:', err);
-        res.status(502).json({ error: 'Bad Gateway - Service unavailable' });
+        // Specialized error handling for timeouts
+        if (err.code === 'ECONNRESET' || err.code === 'ETIMEDOUT') {
+            res.status(504).json({ error: 'Gateway Timeout - Service took too long to respond' });
+        } else {
+            res.status(502).json({ error: 'Bad Gateway - Service unavailable' });
+        }
     },
 };
 

@@ -33,9 +33,11 @@ router.post('/setup', async (req, res) => {
         }
 
         const { userId, insulinRatio, glucoseMin, glucoseMax, mealSchedules } = value;
+        console.log(`[Profile Setup] Received request for userId: ${userId}`);
 
         const client = await pool.connect();
         try {
+            console.log(`[Profile Setup] Database connection acquired for userId: ${userId}`);
             console.log('Starting transaction for user:', userId);
             await client.query('BEGIN');
 
