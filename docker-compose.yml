@@ -153,6 +153,7 @@ services:
       - "4004:4004"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/profiles_db
+      - JWT_SECRET=${JWT_SECRET}
       - NODE_ENV=production
     depends_on:
       postgres:

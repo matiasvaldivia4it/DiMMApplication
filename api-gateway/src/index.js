@@ -66,36 +66,41 @@ app.use('/api/auth', authLimiter, createProxyMiddleware({
     ...proxyOptions,
 }));
 
-// Food recognition routes (with upload rate limiting and authentication)
-app.use('/api/food', authMiddleware, uploadLimiter, createProxyMiddleware({
+// Food recognition routes (with upload rate limiting)
+// Authentication handled by downstream service
+app.use('/api/food', uploadLimiter, createProxyMiddleware({
     target: services.food,
     pathRewrite: { '^/api/food': '' },
     ...proxyOptions,
 }));
 
-// Meal tracking routes (with authentication)
-app.use('/api/meals', authMiddleware, createProxyMiddleware({
+// Meal tracking routes
+// Authentication handled by downstream service
+app.use('/api/meals', createProxyMiddleware({
     target: services.meal,
     pathRewrite: { '^/api/meals': '/meals' },
     ...proxyOptions,
 }));
 
-// User profile routes (with authentication)
-app.use('/api/profile', authMiddleware, createProxyMiddleware({
+// User profile routes
+// Authentication handled by downstream service
+app.use('/api/profile', createProxyMiddleware({
     target: services.profile,
     pathRewrite: { '^/api/profile': '/profile' },
     ...proxyOptions,
 }));
 
-// Notification routes (with authentication)
-app.use('/api/notifications', authMiddleware, createProxyMiddleware({
+// Notification routes
+// Authentication handled by downstream service
+app.use('/api/notifications', createProxyMiddleware({
     target: services.notification,
     pathRewrite: { '^/api/notifications': '/notifications' },
     ...proxyOptions,
 }));
 
-// Analytics routes (with authentication)
-app.use('/api/analytics', authMiddleware, createProxyMiddleware({
+// Analytics routes
+// Authentication handled by downstream service
+app.use('/api/analytics', createProxyMiddleware({
     target: services.analytics,
     pathRewrite: { '^/api/analytics': '/analytics' },
     ...proxyOptions,
