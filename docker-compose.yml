@@ -45,6 +45,7 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification:4005
       - ANALYTICS_SERVICE_URL=http://analytics:4006
       - JWT_SECRET=${JWT_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL:-https://dimma.auditoriasenlinea.com.ar}
       - NODE_ENV=production
       - TRUST_PROXY=true
     depends_on:
