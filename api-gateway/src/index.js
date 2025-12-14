@@ -66,39 +66,36 @@ app.use('/api/auth', authLimiter, createProxyMiddleware({
     ...proxyOptions,
 }));
 
-// Protected routes (require authentication)
-app.use(authMiddleware);
-
-// Food recognition routes (with upload rate limiting)
-app.use('/api/food', uploadLimiter, createProxyMiddleware({
+// Food recognition routes (with upload rate limiting and authentication)
+app.use('/api/food', authMiddleware, uploadLimiter, createProxyMiddleware({
     target: services.food,
     pathRewrite: { '^/api/food': '' },
     ...proxyOptions,
 }));
 
-// Meal tracking routes
-app.use('/api/meals', createProxyMiddleware({
+// Meal tracking routes (with authentication)
+app.use('/api/meals', authMiddleware, createProxyMiddleware({
     target: services.meal,
     pathRewrite: { '^/api/meals': '/meals' },
     ...proxyOptions,
 }));
 
-// User profile routes
-app.use('/api/profile', createProxyMiddleware({
+// User profile routes (with authentication)
+app.use('/api/profile', authMiddleware, createProxyMiddleware({
     target: services.profile,
     pathRewrite: { '^/api/profile': '/profile' },
     ...proxyOptions,
 }));
 
-// Notification routes
-app.use('/api/notifications', createProxyMiddleware({
+// Notification routes (with authentication)
+app.use('/api/notifications', authMiddleware, createProxyMiddleware({
     target: services.notification,
     pathRewrite: { '^/api/notifications': '/notifications' },
     ...proxyOptions,
 }));
 
-// Analytics routes
-app.use('/api/analytics', createProxyMiddleware({
+// Analytics routes (with authentication)
+app.use('/api/analytics', authMiddleware, createProxyMiddleware({
     target: services.analytics,
     pathRewrite: { '^/api/analytics': '/analytics' },
     ...proxyOptions,
