@@ -36,9 +36,11 @@ router.post('/setup', async (req, res) => {
 
         const client = await pool.connect();
         try {
+            console.log('Starting transaction for user:', userId);
             await client.query('BEGIN');
 
             // Check if profile already exists
+            console.log('Checking existing profile...');
             const existing = await client.query('SELECT id FROM profiles WHERE user_id = $1', [userId]);
 
             let profileId;

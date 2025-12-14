@@ -1,16 +1,16 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    max: 20,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
 const initDatabase = async () => {
-    const client = await pool.connect();
-    try {
-        await client.query(`
+  const client = await pool.connect();
+  try {
+    await client.query(`
       CREATE TABLE IF NOT EXISTS profiles (
         id SERIAL PRIMARY KEY,
         user_id INTEGER UNIQUE NOT NULL,
@@ -42,13 +42,13 @@ const initDatabase = async () => {
       CREATE INDEX IF NOT EXISTS idx_meal_schedules_profile_id ON meal_schedules(profile_id);
       CREATE INDEX IF NOT EXISTS idx_ratio_history_profile_id ON ratio_history(profile_id);
     `);
-        console.log('User profile database schema initialized');
-    } catch (error) {
-        console.error('Error initializing database:', error);
-        throw error;
-    } finally {
-        client.release();
-    }
+    console.log('User profile database schema initialized');
+  } catch (error) {
+    console.error('Error initializing database:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 module.exports = { pool, initDatabase };
