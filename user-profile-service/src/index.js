@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 4004;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(helmet());
+// app.use(cors()); // CORS handled by API Gateway
 app.use(morgan('combined'));
 app.use(express.json());
 
