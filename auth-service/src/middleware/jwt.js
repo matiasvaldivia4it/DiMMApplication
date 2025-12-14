@@ -10,6 +10,9 @@ const generateAccessToken = (user) => {
             id: user.id,
             email: user.email,
             name: user.name,
+            role: user.role || 'user',
+            is_active: user.is_active !== false,
+            subscription_status: user.subscription_status || 'free'
         },
         JWT_SECRET,
         { expiresIn: JWT_EXPIRES_IN }

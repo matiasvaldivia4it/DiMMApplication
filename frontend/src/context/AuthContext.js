@@ -42,6 +42,14 @@ export const AuthProvider = ({ children }) => {
             if (userData && error.response && error.response.status === 404) {
                 console.warn('Profile not found for authenticated user, redirecting to setup...');
                 setProfile(null);
+            } else if (error.response && error.response.status === 429) {
+                // Rate limit error - don't logout, just log warning
+                console.warn('Rate limit reached, please wait before refreshing');
+                // Keep user logged in with existing data
+            } else if (error.response && error.response.status === 502) {
+                // Service unavailable - don't logout immediately, retry later
+                console.error('Auth service temporarily unavailable (502)');
+                // Keep user logged in with existing data
             } else {
                 console.error('Auth check failed:', error);
                 localStorage.removeItem('accessToken');
