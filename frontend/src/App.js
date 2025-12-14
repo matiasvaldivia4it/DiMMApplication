@@ -8,6 +8,7 @@ import AddMeal from './pages/AddMeal';
 import MealDetail from './pages/MealDetail';
 import Profile from './pages/Profile';
 import Analytics from './pages/Analytics';
+import AdminDashboard from './pages/AdminDashboard';
 import LandingPage from './pages/LandingPage';
 import './index.css';
 
@@ -43,6 +44,24 @@ const SetupRoute = ({ children }) => {
     return <Navigate to="/dashboard" />;
 };
 
+const AdminRoute = ({ children }) => {
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+            </div>
+        );
+    }
+
+    if (user && user.role === 'admin') {
+        return children;
+    }
+
+    return <Navigate to="/dashboard" />;
+};
+
 function App() {
     return (
         <AuthProvider>
@@ -67,6 +86,17 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <Dashboard />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    <Route
+                        path="/admin"
+                        element={
+                            <PrivateRoute>
+                                <AdminRoute>
+                                    <AdminDashboard />
+                                </AdminRoute>
                             </PrivateRoute>
                         }
                     />
